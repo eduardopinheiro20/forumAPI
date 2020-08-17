@@ -3,9 +3,9 @@ package br.com.edupinheiro.forum.controller;
 import br.com.edupinheiro.forum.controller.dto.TopicoDto;
 import br.com.edupinheiro.forum.modelo.Curso;
 import br.com.edupinheiro.forum.modelo.Topico;
-import org.springframework.stereotype.Controller;
+import br.com.edupinheiro.forum.repository.TopicoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -14,10 +14,18 @@ import java.util.List;
 @RestController
 public class TopicosController {
 
-    @RequestMapping("/topicos")
-    public List<TopicoDto> lista() {
-        Topico topico = new Topico("Dúvida", "Dúvida Spring", new Curso("Spring", "Programação Edu"));
+    @Autowired
+    private TopicoRepository topicoRepository;
 
-        return TopicoDto.converter(Arrays.asList(topico, topico, topico));
+    @RequestMapping("/topicos")
+    public List<TopicoDto> lista(String name) {
+
+        if(name == null){
+            List<Topico> topicos = topicoRepository.findAll();
+            return TopicoDto.converter(topicos);
+        } else {
+            List<Topico> topicos = topicoRepository.findByCursoNome(name);
+            return TopicoDto.converter(topicos);
+        }
     }
 }
