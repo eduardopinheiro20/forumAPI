@@ -1,23 +1,30 @@
 package br.com.edupinheiro.forum.controller;
 
 import br.com.edupinheiro.forum.controller.dto.TopicoDto;
-import br.com.edupinheiro.forum.modelo.Curso;
+import br.com.edupinheiro.forum.controller.form.TopicoForm;
 import br.com.edupinheiro.forum.modelo.Topico;
+import br.com.edupinheiro.forum.repository.CursoRepository;
 import br.com.edupinheiro.forum.repository.TopicoRepository;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
+import javax.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
+@RequestMapping("/topicos")
 public class TopicosController {
 
     @Autowired
     private TopicoRepository topicoRepository;
 
-    @RequestMapping("/topicos")
+    @Autowired
+    private CursoRepository cursoRepository;
+
+   @GetMapping
     public List<TopicoDto> lista(String name) {
 
         if(name == null){
@@ -27,5 +34,15 @@ public class TopicosController {
             List<Topico> topicos = topicoRepository.findByCursoNome(name);
             return TopicoDto.converter(topicos);
         }
+    }
+
+    @PostMapping
+    public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm form, UriComponentsBuilder uriBuilder){
+        
+       Topico topico = form.converter(cursoRepository);
+       topicoRepository.save(topico);
+       
+       URI uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+       return ResponseEntity.created(uri).body(new TopicoDto(topico));
     }
 }
