@@ -1,13 +1,16 @@
 package br.com.edupinheiro.forum.controller.form;
 
-import br.com.edupinheiro.forum.modelo.Curso;
 import br.com.edupinheiro.forum.modelo.Topico;
-import br.com.edupinheiro.forum.repository.CursoRepository;
+import br.com.edupinheiro.forum.repository.TopicoRepository;
 import com.sun.istack.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-public class TopicoForm {
+/**
+ *
+ * @author eduardo-pinheiro
+ */
+public class AtualizacaoTopicoForm {
 
     @NotNull
     @NotEmpty
@@ -18,10 +21,6 @@ public class TopicoForm {
     @NotEmpty
     @Length(min = 10)
     private String mensagem;
-
-    @NotNull
-    @NotEmpty
-    private String nomeCurso;
 
     public String getTitulo() {
         return titulo;
@@ -39,16 +38,14 @@ public class TopicoForm {
         this.mensagem = mensagem;
     }
 
-    public String getNomeCurso() {
-        return nomeCurso;
+    public Topico atualizar(Long id, TopicoRepository topicoRepository) {
+        Topico topico = topicoRepository.getOne(id);
+        
+        topico.setTitulo(this.titulo);
+        topico.setMensagem(this.mensagem);
+        
+        return topico;
     }
-
-    public void setNomeCurso(String nomeCurso) {
-        this.nomeCurso = nomeCurso;
-    }
-
-    public Topico converter(CursoRepository cursoRepository) {
-        Curso curso = cursoRepository.findByNome(nomeCurso);
-        return new Topico(titulo, mensagem, curso);
-    }
+    
+    
 }
